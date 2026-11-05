@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in | SalesPilot</title>
+  <link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+  <aside class="auth-visual">
+    <a class="brand" href="/"><span class="brand-icon">S</span><span>Sales<span class="brand-light">Pilot</span></span></a>
+    <div class="visual-copy">
+      <div class="eyebrow">SALES ANALYTICS, MADE SIMPLE</div>
+      <h1>Make every sale count.</h1>
+      <p>Bring your sales spreadsheets together and turn business data into clearer decisions.</p>
+    </div>
+    <div class="visual-foot">SalesPilot · Sales analytics made easier</div>
+  </aside>
+  <main class="auth-main">
+    <section class="auth-card">
+      <a class="brand mobile-brand" href="/"><span class="brand-icon">S</span><span>Sales<span class="brand-light">Pilot</span></span></a>
+      <h2>Welcome back</h2>
+      <p class="sub">Log in to continue to your SalesPilot workspace.</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+      <form method="post" action="/login">
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" autocomplete="email"
+                 placeholder="you@example.com" value="{{ form_data.email|default('') }}" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password"
+                 placeholder="Enter your password" required>
+        </div>
+        <button class="submit" type="submit">Log in</button>
+      </form>
+      <p class="switch">New to SalesPilot? <a href="/signup">Create an account</a></p>
+    </section>
+  </main>
+</body>
+</html>

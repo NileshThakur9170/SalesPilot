@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SalesPilot Dashboard</title>
+    <meta
+      name="description"
+      content="A Built by Nilesh Kumar: an interactive sales performance and profitability dashboard built with HTML, CSS, JS and Chart.js."
+    />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Chart.js + PapaParse (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ============ LOADER ============ -->
+    <div id="loader" class="loader" aria-live="polite" aria-busy="true">
+      <div class="loader-mark">
+        <svg viewBox="0 0 48 48" width="48" height="48">
+          <circle
+            cx="24"
+            cy="24"
+            r="20"
+            fill="none"
+            stroke="#E5E9F2"
+            stroke-width="4"
+          />
+          <circle
+            cx="24"
+            cy="24"
+            r="20"
+            fill="none"
+            stroke="#1D4ED8"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-dasharray="90 126"
+            class="loader-arc"
+          />
+        </svg>
+      </div>
+      <p>Loading sales data&hellip;</p>
+    </div>
+
+    <div class="app" id="app" hidden>
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <span class="brand-mark">SP</span>
+          <div class="brand-text">
+            <strong>Sales Performance</strong>
+            <span>&amp; Profitability</span>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Primary">
+          <button class="nav-item is-active" data-view="dashboard">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 13h4v8H3zM10 3h4v18h-4zM17 8h4v13h-4z" />
+            </svg>
+            Dashboard
+          </button>
+          <button class="nav-item" data-view="sql">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 4h16v4H4zM4 10h16v4H4zM4 16h16v4H4z" />
+            </svg>
+            SQL Insights
+          </button>
+          <button class="nav-item" data-view="insights">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"
+              />
+            </svg>
+            Business Insights
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <p>Built by Nilesh Kumar</p>
+          <p class="muted" id="currencyLabel">FY2026&ndash;2027 &middot; INR</p>
+        </div>
+      </aside>
+
+      <div class="scrim" id="scrim"></div>
+
+      <!-- ============ MAIN ============ -->
+      <div class="main">
+        <!-- Top bar -->
+        <header class="topbar">
+          <button
+            class="icon-btn menu-btn"
+            id="menuBtn"
+            aria-label="Toggle sidebar"
+            aria-expanded="true"
+            title="Collapse sidebar"
+            type="button"
+          >
+            <svg viewBox="0 0 24 24">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          </button>
+
+          <div class="topbar-title">
+            <h1 id="viewTitle">Dashboard</h1>
+            <p id="viewSubtitle">Overview of revenue, profit and performance</p>
+          </div>
+
+          <div class="topbar-actions">
+            <div class="dataset-control">
+              <label for="datasetSelect">Dataset:</label>
+              <select id="datasetSelect" aria-label="Choose dataset">
+                <option value="">Loading datasets...</option>
+              </select>
+            </div>
+            <a href="/upload" class="manage-data-btn">Manage Data</a>
+            <div class="currency-control">
+              <label for="currencySelect">Currency:</label>
+              <select id="currencySelect">
+                <option value="INR">INR (₹)</option>
+                <option value="USD">USD ($)</option>
+              </select>
+            </div>
+
+            <button class="btn btn-ghost" id="exportCsvBtn">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" />
+              </svg>
+              Export CSV
+            </button>
+
+        <div class="account-menu" id="accountMenu">
+          <button class="account-trigger" id="accountTrigger" type="button"
+                  aria-haspopup="true" aria-expanded="false">
+            <span class="account-avatar" id="accountAvatar">U</span>
+            <span class="account-trigger-name" id="accountTriggerName">Account</span>
+            <span class="account-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="account-dropdown" id="accountDropdown" hidden>
+            <div class="account-dropdown-user">
+              <strong id="dropdownUserName">Account</strong>
+              <small id="dropdownUserEmail"></small>
+            </div>
+            <button class="account-dropdown-item" id="openSettingsBtn" type="button">Account settings</button>
+            <button class="account-dropdown-item" id="switchAccountBtn" type="button">Switch account</button>
+            <form method="post" action="/logout">
+              <button class="account-dropdown-item danger" type="submit">Log out</button>
+            </form>
+          </div>
+        </div>
+          </div>
+        </header>
+
+        <!-- Filter bar -->
+        <div class="filterbar" id="filterbar">
+          <div class="filter-group">
+            <label for="yearFilter">Year</label>
+            <select id="yearFilter">
+              <option value="all">All years</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="regionFilter">Region</label>
+            <select id="regionFilter">
+              <option value="all">All regions</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="categoryFilter">Category</label>
+            <select id="categoryFilter">
+              <option value="all">All categories</option>
+            </select>
+          </div>
+          <button class="btn btn-text" id="resetFilters">Reset filters</button>
+          <div class="filter-chips" id="filterChips" aria-live="polite"></div>
+        </div>
+
+        <!-- ============ DASHBOARD VIEW ============ -->
+        <section class="view is-active" id="view-dashboard">
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <div class="kpi-icon kpi-icon--sales">
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 17l6-6 4 4 8-8M21 7v6M21 7h-6" />
+                </svg>
+              </div>
+              <div class="kpi-body">
+                <span class="kpi-label">Total Sales</span>
+                <span class="kpi-value" id="kpiSales">$0</span>
+                <span class="kpi-sub" id="kpiSalesSub">&nbsp;</span>
+              </div>
+            </article>
+
+            <article class="kpi-card" id="profitKpiCard">
+              <div class="kpi-icon kpi-icon--profit">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 2v20M17 5.5C17 3.6 14.8 2 12 2s-5 1.6-5 3.5S9.2 9 12 9s5 1.6 5 3.5S14.8 16 12 16s-5-1.6-5-3.5"
+                  />
+                </svg>
+              </div>
+              <div class="kpi-body">
+                <span class="kpi-label">Total Profit</span>
+                <span class="kpi-value" id="kpiProfit">$0</span>
+                <span class="kpi-sub" id="kpiProfitSub">&nbsp;</span>
+              </div>
+            </article>
+
+            <article class="kpi-card">
+              <div class="kpi-icon kpi-icon--orders">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M6 2l1.5 4M6 2h13l-2 9H8M6 2L4 2M7.5 6h13.5l-1.7 7"
+                  />
+                  <circle cx="9" cy="20" r="1.5" />
+                  <circle cx="17" cy="20" r="1.5" />
+                </svg>
+              </div>
+              <div class="kpi-body">
+                <span class="kpi-label">Total Orders</span>
+                <span class="kpi-value" id="kpiOrders">0</span>
+                <span class="kpi-sub" id="kpiOrdersSub">&nbsp;</span>
+              </div>
+            </article>
+
+            <article class="kpi-card">
+              <div class="kpi-icon kpi-icon--aov">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 3v18M5 8h9a3 3 0 010 6H8a3 3 0 000 6h10" />
+                </svg>
+              </div>
+              <div class="kpi-body">
+                <span class="kpi-label">Avg Order Value</span>
+                <span class="kpi-value" id="kpiAov">$0</span>
+                <span class="kpi-sub" id="kpiAovSub">&nbsp;</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="chart-grid" id="defaultChartsGrid">
+            <article id="categoryChartCard" class="chart-card">
+              <header>
+                <h2>Sales by Category</h2>
+                <button
+                  class="icon-btn download-btn"
+                  data-chart="categoryChart"
+                  aria-label="Download chart as PNG"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" />
+                  </svg>
+                </button>
+              </header>
+              <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+            </article>
+
+            <article id="regionChartCard" class="chart-card">
+              <header>
+                <h2>Sales by Region</h2>
+                <button
+                  class="icon-btn download-btn"
+                  data-chart="regionChart"
+                  aria-label="Download chart as PNG"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" />
+                  </svg>
+                </button>
+              </header>
+              <div class="chart-wrap"><canvas id="regionChart"></canvas></div>
+            </article>
+
+            <!-- <article class="chart-card">
+              <header>
+                <h2>Top 10 Products</h2>
+                <button
+                  class="icon-btn download-btn"
+                  data-chart="topProductsChart"
+                  aria-label="Download chart as PNG"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" />
+                  </svg>
+                </button>
+              </header>
+              <div class="chart-wrap chart-wrap--tall">
+                <canvas id="topProductsChart"></canvas>
+              </div>
+            </article> -->
+
+            <article id="profitChartCard" class="chart-card">
+              <header>
+                <h2>Profit vs Sales</h2>
+                <button
+                  class="icon-btn download-btn"
+                  data-chart="scatterChart"
+                  aria-label="Download chart as PNG"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" />
+                  </svg>
+                </button>
+              </header>
+              <div class="chart-wrap"><canvas id="scatterChart"></canvas></div>
+            </article>
+          </div>
+
+          <!-- Custom Chart Builder -->
+          <section class="custom-chart-section">
+            <header class="section-header">
+              <div>
+                <h2>Custom Charts</h2>
+                <p>Create charts based on your business requirements.</p>
+              </div>
+            </header>
+
+            <article class="chart-card custom-chart-builder">
+              <div class="chart-builder-controls">
+                <div class="form-group">
+                  <label for="customMetric">Metric</label>
+                  <select id="customMetric">
+                    <option value="sales">Sales</option>
+                    <option value="profit">Profit</option>
+                    <option value="quantity">Quantity Sold</option>
+                    <option value="orders">Orders</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="customGroup">Group By</label>
+                  <select id="customGroup">
+                    <option value="year" selected>Year</option>
+                    <option value="month">Month</option>
+                    <option value="quarter">Quarter</option>
+                    <option value="category">Category</option>
+                    <option value="product">Product</option>
+                    <option value="region">Region</option>
+                    <option value="rep">Sales Representative</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="customChartType">Chart Type</label>
+                  <select id="customChartType">
+                    <option value="bar" selected>Bar Chart</option>
+                    <option value="line">Line Chart</option>
+                    <option value="pie">Pie Chart</option>
+                    <option value="doughnut">Doughnut Chart</option>
+                  </select>
+                </div>
+
+                <button id="addCustomChart" class="primary-btn" type="button">
+                  + Add Chart
+                </button>
+              </div>
+            </article>
+
+            <div id="customChartsGrid" class="chart-grid"></div>
+          </section>
+
+          <!-- Table -->
+          <article class="table-card">
+            <header class="table-card-header">
+              <h2>Sales Transactions</h2>
+              <div class="table-controls">
+                <div class="search-box">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M21 21l-4.3-4.3" />
+                  </svg>
+                  <input
+                    type="search"
+                    id="tableSearch"
+                    placeholder="Search product, rep, customer, city&hellip;"
+                  />
+                </div>
+                <span class="table-count" id="tableCount"></span>
+              </div>
+            </header>
+
+            <div class="table-scroll">
+              <table id="salesTable">
+                <thead>
+                  <tr>
+                    <th data-key="orderId" data-field="orderId">Order ID</th>
+                    <th data-key="date" data-field="date">Date</th>
+                    <th data-key="region" data-field="region">Region</th>
+                    <th data-key="category" data-field="category">Category</th>
+                    <th data-key="product" data-field="product">Product</th>
+                    <th data-key="rep" data-field="rep">Sales Rep</th>
+                    <th data-key="sales" data-field="sales" class="num">Sales</th>
+                    <th data-key="profit" data-field="profit" class="num">Profit</th>
+                    <th data-key="margin" data-field="margin" class="num">Margin</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+              </table>
+            </div>
+
+            <footer class="table-pagination">
+              <button class="btn btn-ghost" id="prevPage">Previous</button>
+              <span id="pageInfo">Page 1</span>
+              <button class="btn btn-ghost" id="nextPage">Next</button>
+            </footer>
+          </article>
+        </section>
+
+        <!-- ============ SQL INSIGHTS VIEW ============ -->
+        <section class="view" id="view-sql">
+          <p class="view-intro">
+            The dataset was also modeled and queried in SQL (see
+            <code>sql_analysis.sql</code>) to demonstrate database-level
+            analysis alongside the spreadsheet/dashboard view. Each card below
+            explains the business question a query answers &mdash; expand a card
+            to see the query itself.
+          </p>
+          <div class="sql-grid" id="sqlGrid"></div>
+        </section>
+
+        <!-- ============ BUSINESS INSIGHTS VIEW ============ -->
+        <section class="view" id="view-insights">
+          <p class="view-intro">
+            Findings below are computed live from the currently filtered dataset
+            &mdash; adjust the filters at the top of the page and these update
+            automatically.
+          </p>
+          <div class="insights-grid" id="insightsGrid"></div>
+        </section>
+      </div>
+    </div>
+
+
+    <div class="settings-overlay" id="settingsOverlay" hidden>
+      <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <header class="settings-header">
+          <div><h2 id="settingsTitle">Account settings</h2><p>Manage your profile and security.</p></div>
+          <button class="icon-btn" id="closeSettingsBtn" type="button" aria-label="Close settings">×</button>
+        </header>
+        <div id="settingsFlashes" aria-live="polite"></div>
+        <section class="settings-section">
+          <h3>Profile information</h3>
+          <form id="profileForm" class="settings-form">
+            <label for="settingsName">Full name</label>
+            <input id="settingsName" name="name" maxlength="80" required>
+            <label for="settingsEmail">Email address</label>
+            <input id="settingsEmail" name="email" type="email" maxlength="254" required>
+            <label for="profileCurrentPassword">Confirm with current password</label>
+            <input id="profileCurrentPassword" type="password" required autocomplete="current-password">
+            <button class="settings-save" type="submit">Save profile</button>
+          </form>
+        </section>
+        <section class="settings-section">
+          <h3>Change password</h3>
+          <form id="passwordForm" class="settings-form">
+            <label for="passwordCurrent">Current password</label>
+            <input id="passwordCurrent" type="password" required autocomplete="current-password">
+            <label for="passwordNew">New password (at least 8 characters)</label>
+            <input id="passwordNew" type="password" minlength="8" required autocomplete="new-password">
+            <label for="passwordConfirm">Confirm new password</label>
+            <input id="passwordConfirm" type="password" minlength="8" required autocomplete="new-password">
+            <button class="settings-save" type="submit">Update password</button>
+          </form>
+        </section>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="datasets.js"></script>
+    <script src="account.js"></script>
+  </body>
+</html>

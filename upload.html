@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manage Data | SalesPilot</title>
+<link rel="stylesheet" href="/upload.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="top"><a class="brand" href="/dashboard">SalesPilot</a><a href="/dashboard">← Back to dashboard</a></header>
+  <section class="panel">
+    <p class="eyebrow">DATA MANAGEMENT</p>
+    <h1>Upload your sales data</h1>
+    <p class="sub">Upload an Excel workbook (.xlsx) or CSV file. Preview and validate it before importing.</p>
+    <form id="uploadForm">
+      <label class="drop" for="fileInput"><strong>Select a file</strong><span>Excel (.xlsx) or CSV (.csv) · Maximum 20 MB</span><input id="fileInput" name="file" type="file" accept=".xlsx,.csv" required></label>
+      <button class="primary" type="submit">Preview file</button>
+    </form>
+    <div id="status" class="status" role="status"></div>
+    <section id="previewPanel" hidden>
+      <h2 id="previewTitle">File preview</h2>
+      <p id="previewMeta" class="sub"></p>
+      <div class="table-wrap"><table id="previewTable"></table></div>
+      <h2>Map your columns</h2>
+      <p class="sub">SalesPilot suggests matches automatically. Review them and map only the fields available in your file. Unmapped fields remain available as original columns.</p>
+      <div id="mappingGrid" class="mapping-grid"></div>
+      <h2>What should SalesPilot do with this file?</h2>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="mode" value="new" checked><span><b>Create new dataset</b><small>Keep existing datasets separate and create a new dashboard.</small></span></label>
+        <label class="choice"><input type="radio" name="mode" value="append"><span><b>Append to existing dataset</b><small>Add rows to a selected dataset. Exact duplicate rows are skipped.</small></span></label>
+        <label class="choice"><input type="radio" name="mode" value="replace"><span><b>Replace existing dataset</b><small>Remove the selected dataset's current rows and import this file.</small></span></label>
+      </div>
+      <div id="newNameWrap"><label for="datasetName">New dataset name</label><input id="datasetName" maxlength="80" placeholder="e.g. FY 2026 Sales"></div>
+      <div id="targetWrap" hidden><label for="targetDataset">Select existing dataset</label><select id="targetDataset"></select></div>
+      <button id="importBtn" class="primary" type="button">Import data</button>
+    </section>
+  </section>
+  <footer>SalesPilot · Your uploaded datasets are scoped to your account on this computer.</footer>
+</main>
+<script src="/upload.js"></script>
+</body></html>

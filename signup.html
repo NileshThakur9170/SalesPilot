@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create your account | SalesPilot</title>
+  <link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+  <aside class="auth-visual">
+    <a class="brand" href="/"><span class="brand-icon">S</span><span>Sales<span class="brand-light">Pilot</span></span></a>
+    <div class="visual-copy">
+      <div class="eyebrow">SALES ANALYTICS, MADE SIMPLE</div>
+      <h1>Make every sale count.</h1>
+      <p>Bring your sales spreadsheets together and turn business data into clearer decisions.</p>
+    </div>
+    <div class="visual-foot">SalesPilot · Sales analytics made easier</div>
+  </aside>
+  <main class="auth-main">
+    <section class="auth-card">
+      <a class="brand mobile-brand" href="/"><span class="brand-icon">S</span><span>Sales<span class="brand-light">Pilot</span></span></a>
+      <h2>Create your account</h2>
+      <p class="sub">Set up your SalesPilot account to get started.</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+      <form method="post" action="/signup">
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" maxlength="80" autocomplete="name"
+                 placeholder="Enter your name" value="{{ form_data.name|default('') }}" required>
+        </div>
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" maxlength="254" autocomplete="email"
+                 placeholder="you@example.com" value="{{ form_data.email|default('') }}" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" minlength="8"
+                 autocomplete="new-password" placeholder="At least 8 characters" required>
+        </div>
+        <div class="field">
+          <label for="confirm_password">Confirm password</label>
+          <input id="confirm_password" name="confirm_password" type="password" minlength="8"
+                 autocomplete="new-password" placeholder="Re-enter your password" required>
+        </div>
+        <button class="submit" type="submit">Create account</button>
+      </form>
+      <p class="switch">Already have an account? <a href="/login">Log in</a></p>
+    </section>
+  </main>
+</body>
+</html>
